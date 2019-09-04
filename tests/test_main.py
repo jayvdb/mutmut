@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 import xml.etree.ElementTree as ET
 import subprocess
 from time import time
@@ -159,7 +160,10 @@ def test_python_source_files__with_paths_to_exclude(tmpdir):
 def test_popen_streaming_output_timeout():
     start = time()
     with pytest.raises(TimeoutError):
-        popen_streaming_output('python -c "import time; time.sleep(4)"', lambda line: line, timeout=0.1)
+        popen_streaming_output(
+            sys.executable + ' -c "import time; time.sleep(4)"',
+            lambda line: line, timeout=0.1,
+        )
 
     assert (time() - start) < 3
 
@@ -167,20 +171,23 @@ def test_popen_streaming_output_timeout():
 def test_popen_streaming_output_stream():
     mock = MagicMock()
     popen_streaming_output(
-        'python -c "print(\'first\'); print(\'second\')"',
+        sys.executable + ' -c "print(\'first\'); print(\'second\')"',
         callback=mock
     )
     mock.assert_has_calls([call('first'), call('second')])
 
     mock = MagicMock()
     popen_streaming_output(
-        'python -c "import time; print(\'first\'); time.sleep(1); print(\'second\'); print(\'third\')"',
+        sys.executable +
+        ' -c "import time; print(\'first\'); time.sleep(1); print(\'second\'); print(\'third\')"',
         callback=mock
     )
     mock.assert_has_calls([call('first'), call('second'), call('third')])
 
     mock = MagicMock()
-    popen_streaming_output('python -c "exit(0);"', callback=mock)
+    popen_streaming_output(
+        sys.executable + ' -c "exit(0);"',
+        callback=mock)
     mock.assert_not_called()
 
 
