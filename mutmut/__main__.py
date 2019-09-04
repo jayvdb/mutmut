@@ -193,7 +193,7 @@ class Progress(object):
 @config_from_setup_cfg(
     dict_synonyms='',
     paths_to_exclude='',
-    runner='python -m pytest -x',
+    runner=sys.executable + ' -m pytest -x',
     tests_dir='tests/:test/',
     pre_mutation=None,
     post_mutation=None,
